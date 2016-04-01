@@ -1,0 +1,20 @@
+{
+	"name": "Rosette Sentiment Analysis",
+	"version": "1.1",
+	"description": "Rosette Text Analytics Power Pack Extensions - Sentiment Analysis for Twitter & Facebook",
+	"browser_action": { "default_icon": "images/Sentiment_OFF.png", "default_popup": "popup.html" },
+	"background": { "scripts":["background.js"], "persistent": false},
+	"icons": { "128": "images/RosetteAPI-Icon.png" },
+	"permissions": [
+		"tabs",
+		"storage",
+		"https://api.rosette.com/",
+		"*://*.twitter.com/*",
+		"*://*.facebook.com/*"
+	],
+	"options_ui": {
+    	"page": "options.html",
+    	"chrome_style": true
+    },
+	"manifest_version": 2
+}

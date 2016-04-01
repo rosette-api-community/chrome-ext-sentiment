@@ -1,0 +1,57 @@
+<!doctype html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<html>
+  <head>
+    <title>Options</title>
+    <link href="css/style.css" rel="stylesheet" type="text/css" media="screen" />
+	<style>
+      .container {
+        /* avoid an excessively wide status text */
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 500px;
+        width: 400px;
+        height: 100%;
+      }
+      #status {
+      padding: 10px;
+      }
+    </style>
+    <script src="popup.js"></script>
+  </head>
+  <body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3">
+				<h3 class="text-center"><img src="images/RosetteAPI-Icon.png" width="36px" height="36px"></img> Rosette Sentiment Analysis</h3>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3">
+				<hr>
+				<h4>Preferences:</h4>
+				
+				<div class="checkbox">
+					<form id="site-selector">
+						<label>
+							<input type="checkbox" id="TSA" value="tsa"> Twitter Sentiment Analysis
+						</label>
+						<label>
+							<input type="checkbox" id="FSA" value="fsa"> Facebook Sentiment Analysis
+						</label>
+					</form>
+				</div>
+				<hr>
+			</div>
+		</div>
+	
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<!--<a href="chrome://extensions?options=jbbcffpanimckakafabcgccckdjkpbok">Go to options.</a>-->
+				<a href="options.html"><button type="button" class="btn btn-primary btn-xs" id="enter-key">Enter API Key</button></a>
+			</div>
+		</div>
+	</div>
+  </body>
+</html>
+
