@@ -1,4 +1,14 @@
 // Saves options to chrome.storage.sync.
+
+function saveKey() {
+	chrome.storage.local.get('rosetteKey', function(result){
+		if(result.rosetteKey != undefined)
+        document.getElementById('user-key').value = result.rosetteKey;
+	});
+}
+
+window.onload = saveKey();
+
 function save_options() {
   var entryField = document.getElementById('user-key');
   chrome.storage.local.set({'rosetteKey': entryField.value}, function() {
