@@ -1,4 +1,5 @@
 
+var Api = require('rosette-api').Api;
 var FACEBOOK_FB_TEXT_CLASS = "_5pbx userContent"; // css class name of fb text
 var FACEBOOK_FB_OUTER_CLASS = "_4-u2" // css class name of outer container of fb text
 var rosetteKey = null; // developer key with which to accesse Rosette API
@@ -55,38 +56,18 @@ function getSentimentAndColor(resp, container) {
 var setBackgroundColor = function(text, container) {
     chrome.storage.local.get('rosetteKey', function (result) {
         if (result.rosetteKey != null) {
-                var JSONtext = "{\"content\": " + JSON.stringify(text) + "}";
-                var xmlhttp = new XMLHttpRequest();
-                var url = "https://api.rosette.com/rest/v1/sentiment";
+        var apiSent = new Api(result.rosetteKey, 'https://api.rosette.com/rest/v1/');
+        var endpoint = "sentiment";
+        apiSent.parameters.content = JSON.stringify(text);
+        apiSent.parameters.language = "eng";
 
-                xmlhttp.open("POST", url, true);
-                xmlhttp.setRequestHeader ("X-RosetteAPI-Key", result.rosetteKey);
-                xmlhttp.setRequestHeader ("Accept", "application/json");
-                xmlhttp.setRequestHeader ("Content-Type", "application/json");
-                xmlhttp.input = JSONtext;
-                xmlhttp.onreadystatechange = function() {
-                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                        var JSONresponse= JSON.parse(xmlhttp.responseText);
-                        getSentimentAndColor (JSONresponse, container);
-                    }
-                }
-                // Function that accesses requests queue when a request completes (regardless of whether the 
-                // request returns an error or not), removes itself from top of queue, and sends next request.
-                // This is necessary because Rosette API limits the number of requests that can be made concurrently.
-                xmlhttp.onload = function () {
-                    requests.shift();
-                    if (requests.length > 0) {
-                        requests[0].send(requests[0].input);
-                    } else { // removes itself if it's the last one left in the queue; probably unnecessary
-                        requests.shift();
-                    }
-                }
-                requests.push(xmlhttp);
-
-                // send first request, which will trigger the rest through the onload method
-                if (requests.length == 1) {
-                    requests[0].send(requests[0].input);
-                }
+        apiSent.rosette(endpoint, function(err, res){
+          if(err){
+            console.log(err);
+          } else {
+            getSentimentAndColor(res, container);
+          }
+        });
         }
     });
     

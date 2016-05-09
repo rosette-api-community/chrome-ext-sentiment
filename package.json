@@ -1,0 +1,26 @@
+{
+  "name": "chrome-ext-sentiment",
+  "version": "1.0.0",
+  "description": "Rosette Text Analytics Power Pack Extensions - Sentiment Analysis for Twitter & Facebook",
+  "main": "background.js",
+  "scripts": {
+    "build": "browserify content_twitter.js -o bundle.js",
+    "buildFB": "browserify content_fb.js -o bundle2.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosette-api-community/chrome-ext-sentiment.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/rosette-api-community/chrome-ext-sentiment/issues"
+  },
+  "homepage": "https://github.com/rosette-api-community/chrome-ext-sentiment#readme",
+  "devDependencies": {
+    "browserify": "^13.0.0"
+  },
+  "dependencies": {
+    "rosette-api": "^1.1.0"
+  }
+}

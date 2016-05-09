@@ -30,7 +30,7 @@ function putSentiment(tab) {
 		if (result.siteSelectors.indexOf("tsa") > -1) { // when twitter box is checked
 			chrome.tabs.query({"url": "*://*.twitter.com/*", "active": true}, function (queryResult) {
 				if ((queryResult.length > 0) && (queryResult[0].status === "complete")) { // after page finishes loading
-					chrome.tabs.executeScript(queryResult[0].id, {file: "content_twitter.js"});
+					chrome.tabs.executeScript(queryResult[0].id, {file: "bundle.js"});
 				}
 			});
 		}
@@ -38,7 +38,7 @@ function putSentiment(tab) {
 		if (result.siteSelectors.indexOf("fsa") > -1) { // when facebook box is checked
 			chrome.tabs.query({"url": "*://*.facebook.com/*", "active": true}, function (queryResult) {
 				if ((queryResult.length > 0) && (queryResult[0].status === "complete")) { // after page finishes loading
-					chrome.tabs.executeScript(queryResult[0].id, {file: "content_fb.js"});
+					chrome.tabs.executeScript(queryResult[0].id, {file: "bundle2.js"});
 				}
 			});
 		}

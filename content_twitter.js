@@ -1,4 +1,4 @@
-
+var Api = require('rosette-api').Api;
 var TWITTER_TWEET_TEXT_CLASS = "tweet-text"; //css class name of tweet text
 var TWITTER_TWEET_CONTAINER_CLASS = "tweet"; //css class name of tweet text container
 var requests = [];
@@ -54,38 +54,20 @@ function getSentimentAndColor(resp, container) {
 var setBackgroundColor = function(text, container) {
     chrome.storage.local.get('rosetteKey', function (result) {
         if (result.rosetteKey != null) {
-            var JSONtext = "{\"content\": " + JSON.stringify(text) + "}";
-            var xmlhttp = new XMLHttpRequest();
-            var url = "https://api.rosette.com/rest/v1/sentiment";
 
-            xmlhttp.open("POST", url, true);
-            xmlhttp.setRequestHeader ("X-RosetteAPI-Key", result.rosetteKey);
-            xmlhttp.setRequestHeader ("Accept", "application/json");
-            xmlhttp.setRequestHeader ("Content-Type", "application/json");
-            xmlhttp.input = JSONtext;
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    var JSONresponse= JSON.parse(xmlhttp.responseText);
-                    getSentimentAndColor (JSONresponse, container);
-                }
-            }
-            // Function that accesses requests queue when a request completes (regardless of whether the 
-            // request returns an error or not), removes itself from top of queue, and sends next request.
-            // This is necessary because Rosette API limits the number of requests that can be made concurrently.
-            xmlhttp.onload = function() {
-                if (requests.length > 1) {
-                    requests.shift();
-                    requests[0].send(requests[0].input);
-                } else { // removes itself if it's the last one left in the queue
-                    requests.shift();
-                }
-            }
-            requests.push(xmlhttp);
+        var apiSent = new Api(result.rosetteKey, 'https://api.rosette.com/rest/v1/');
+        var endpoint = "sentiment";
+        apiSent.parameters.content = JSON.stringify(text);
+        apiSent.parameters.language = "eng";
 
-            // send first request, which will trigger the rest through the onload method
-            if (requests.length == 1) {
-                    requests[0].send(requests[0].input);
-                }
+        apiSent.rosette(endpoint, function(err, res){
+          if(err){
+            console.log(err);
+          } else {
+            getSentimentAndColor(res, container);
+          }
+        });
+
         }
     });
     
@@ -98,17 +80,17 @@ var hasClass = function(element, cls) {
 
 // given a tweet element, return the container element
 var getTweetContainer = function(tweet) {
-	var container = tweet;
-	while(!hasClass(container, TWITTER_TWEET_CONTAINER_CLASS) && container.parentNode) {
-		container = container.parentNode;
-	}
-	return container;
+    var container = tweet;
+    while(!hasClass(container, TWITTER_TWEET_CONTAINER_CLASS) && container.parentNode) {
+        container = container.parentNode;
+    }
+    return container;
 };
 
 // main function for filling in the colors corresponding to different sentiments on a twitter page
 var fillSentiment = function() {
     var tweets = document.getElementsByClassName(TWITTER_TWEET_TEXT_CLASS);
-	
+    
     // first make sure there are new entries to analyze
     var newEntries = false;
     for (var i in tweets) {
@@ -121,14 +103,14 @@ var fillSentiment = function() {
     }
     if (!newEntries)
         return;
-	
+    
     for (var i in tweets) {
         var tweet = tweets[i];
         if(!tweet.getAttribute || tweet.getAttribute("rosette")) {
             continue;
         }
         tweet.setAttribute("rosette", "1");
-		// analyze new entries
+        // analyze new entries
         var text = tweet.innerText;
         var container = getTweetContainer(tweet);
         setBackgroundColor(text, container);
