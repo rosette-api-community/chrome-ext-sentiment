@@ -5,7 +5,8 @@ var FACEBOOK_FB_TEXT_CLASS = "_5pbx userContent"; // css class name of fb text
 var FACEBOOK_FB_OUTER_CLASS = "_4-u2" // css class name of outer container of fb text
 var rosetteKey = null; // developer key with which to accesse Rosette API
 var requests = []; // XMLHttpRequest queue
-
+chrome.storage.local.get('rosetteKey', function (result) {
+    var apiSent = new Api(result.rosetteKey, 'https://api.rosette.com/rest/v1/');
 // given a sentiment score (from -.5 to .5), return an html color representing that sentiment
 var sentimentColor = function(sentiment) {
 	var color = '';
@@ -33,6 +34,34 @@ var sentimentColor = function(sentiment) {
 	return color;
 };
 
+function request(apiSent, endpoint, content, container, counter) {
+    if(counter < 1){
+        return counter;
+    }
+
+    apiSent.parameters.content = content[0];
+    apiSent.parameters.language = "eng";
+
+    apiSent.rosette(endpoint, function(err, res){
+      if(err){
+        if(err["message"]){
+                    console.log(err);
+                }
+
+            content.shift();
+            container.shift();
+            counter = counter - 1;
+            return request(apiSent, endpoint, content, container, counter);
+      } else {
+        content.shift();
+        container.shift();
+        counter = counter - 1;
+        getSentimentAndColor(res, container[0]);
+        return request(apiSent, endpoint, content, container, counter);
+      }
+    });
+}
+
 // given a sentiment response from the Rosette API and a text container, 
 // set the outer container's background color according to its
 // calculated sentiment
@@ -54,23 +83,22 @@ function getSentimentAndColor(resp, container) {
 }
 
 // given some text, return a rating from -2 to 2 representing the sentiment
-var setBackgroundColor = function(text, container) {
-    chrome.storage.local.get('rosetteKey', function (result) {
+var setBackgroundColor = function(contentQ, containerQ) {
+    //chrome.storage.local.get('rosetteKey', function (result) {
         if (result.rosetteKey != null) {
-        var apiSent = new Api(result.rosetteKey, 'https://api.rosette.com/rest/v1/');
+        
         var endpoint = "sentiment";
-        apiSent.parameters.content = JSON.stringify(text);
-        apiSent.parameters.language = "eng";
-
+        request(apiSent, endpoint, contentQ, containerQ, contentQ.length);
+/*
         apiSent.rosette(endpoint, function(err, res){
           if(err){
             console.log(err);
           } else {
             getSentimentAndColor(res, container);
           }
-        });
+        });*/
         }
-    });
+    //});
     
 };
 
@@ -115,7 +143,8 @@ var fillSentiment = function() {
     }
     if (!newEntries)
         return;
-	
+	var contentQ = [];
+    var containerQ = [];
     for (var i in fbs) {
         var fb = fbs[i];
         if(!fb.getAttribute || fb.getAttribute("rosette")) {
@@ -129,8 +158,12 @@ var fillSentiment = function() {
         // analyze new entries
         var text = fb.firstElementChild.innerText;
         var container = getFBContainer(fb);
-        setBackgroundColor(text, container);
+        contentQ[i] = text;
+        containerQ[i] = container;
+        //setBackgroundColor(text, container);
     }
+    console.log(contentQ.length)
+    setBackgroundColor(contentQ, containerQ);
 };
 
 //listen for when DOM is changed by AJAX calls
@@ -149,7 +182,7 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
         location.reload();
     }
 });
-
+});
 // NOTE: This file contains the most elegant
 // structure for sending non-concurrent XMLHttpRequests (to avoid 429 errors)
 // out of all the Chrome extension examples.

@@ -1,4 +1,4 @@
-var Api = require('rosette-api').Api;
+var Api = require('rosette-api');
 var TWITTER_TWEET_TEXT_CLASS = "tweet-text"; //css class name of tweet text
 var TWITTER_TWEET_CONTAINER_CLASS = "tweet"; //css class name of tweet text container
 var requests = [];
@@ -59,6 +59,10 @@ var setBackgroundColor = function(text, container) {
         var endpoint = "sentiment";
         apiSent.parameters.content = JSON.stringify(text);
         apiSent.parameters.language = "eng";
+         var appHeader = [];
+          appHeader[0] = "X-RosetteAPI-App"
+          appHeader[1] = "chrome-extension-sentiment";
+          apiSent.parameters.customHeaders = [appHeader];
 
         apiSent.rosette(endpoint, function(err, res){
           if(err){
